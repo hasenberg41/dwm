@@ -236,7 +236,7 @@ drw_rect(Drw *drw, int x, int y, unsigned int w, unsigned int h, int filled, int
 }
 
 int
-drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lpad, const char *text, int invert)
+drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lpad, const char *text, int invert, int statusfontindex )
 {
 	int i, ty, ellipsis_x = 0;
 	unsigned int tmpw, ew, ellipsis_w = 0, ellipsis_len;
@@ -272,14 +272,16 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 
 	usedfont = drw->fonts;
 	if (!ellipsis_width && render)
-		ellipsis_width = drw_fontset_getwidth(drw, "...");
+		ellipsis_width = drw_fontset_getwidth(drw, "...",0);
 	while (1) {
 		ew = ellipsis_len = utf8strlen = 0;
 		utf8str = text;
 		nextfont = NULL;
 		while (*text) {
 			utf8charlen = utf8decode(text, &utf8codepoint, UTF_SIZ);
-			for (curfont = drw->fonts; curfont; curfont = curfont->next) {
+			curfont = drw->fonts;
+			for (int i=0;i<statusfontindex;i++) {curfont = curfont->next;}
+			for (; curfont; curfont = curfont->next) {
 				charexists = charexists || XftCharExists(drw->dpy, curfont->xfont, utf8codepoint);
 				if (charexists) {
 					drw_font_getexts(curfont, text, utf8charlen, &tmpw, NULL);
@@ -326,7 +328,7 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 			w -= ew;
 		}
 		if (render && overflow)
-			drw_text(drw, ellipsis_x, y, ellipsis_w, h, 0, "...", invert);
+			drw_text(drw, ellipsis_x, y, ellipsis_w, h, 0, "...", invert,statusfontindex);
 
 		if (!*text || overflow) {
 			break;
@@ -395,19 +397,19 @@ drw_map(Drw *drw, Window win, int x, int y, unsigned int w, unsigned int h)
 }
 
 unsigned int
-drw_fontset_getwidth(Drw *drw, const char *text)
+drw_fontset_getwidth(Drw *drw, const char *text,int statusfontindex)
 {
 	if (!drw || !drw->fonts || !text)
 		return 0;
-	return drw_text(drw, 0, 0, 0, 0, 0, text, 0);
+	return drw_text(drw, 0, 0, 0, 0, 0, text, 0,statusfontindex);
 }
 
 unsigned int
-drw_fontset_getwidth_clamp(Drw *drw, const char *text, unsigned int n)
+drw_fontset_getwidth_clamp(Drw *drw, const char *text, unsigned int n, int statusfontindex)
 {
 	unsigned int tmp = 0;
 	if (drw && drw->fonts && text && n)
-		tmp = drw_text(drw, 0, 0, 0, 0, 0, text, n);
+		tmp = drw_text(drw, 0, 0, 0, 0, 0, text, n,statusfontindex);
 	return MIN(n, tmp);
 }
 
