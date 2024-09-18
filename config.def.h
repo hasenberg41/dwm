@@ -65,10 +65,10 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      previewtag,     {.ui = TAG } },     \
 
+#include <X11/XF86keysym.h>
+
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-
-#include <X11/XF86keysym.h>
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
@@ -77,16 +77,18 @@ static const char *termcmd[]  = { "kitty", NULL };
 static const char *clipcmd[] = { "clipmenu", "-i", "-fn", dmenufont, NULL };
 static const char *urlcmd[] = { "clipmenu-url",  NULL };
 static const char *flameshot[] = { "flameshot", "gui",  NULL };
-static const char *increasevolume[]  = { "amixer", "sset", "master", "5%+", NULL };
-static const char *decreasevolume[]  = { "amixer", "sset", "master", "5%-", NULL };
-static const char *togglevolume[]  = { "amixer", "sset", "master", "toggle", NULL };
-static const char *lightup[]  = { "light", "-a", "10", NULL };
-static const char *lightdown[]  = { "light", "-u", "10", NULL };
+static const char *increasevolume[]  = { "amixer", "sset", "Master", "5%+", NULL };
+static const char *decreasevolume[]  = { "amixer", "sset", "Master", "5%-", NULL };
+static const char *togglevolume[]  = { "amixer", "sset", "Master", "toggle", NULL };
+static const char *lightup[]  = { "light", "-A", "10", NULL };
+static const char *lightdown[]  = { "light", "-U", "10", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY,                       XK_c,      spawn,          {.v = clipcmd } },
+	{ MODKEY,                       XK_u,      spawn,          {.v = urlcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -108,8 +110,6 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,                       XK_c,      spawn,          {.v = clipcmd } },
-	{ MODKEY,                       XK_u,      spawn,          {.v = urlcmd } },
 	{ 0,                            XK_Print,  spawn,          {.v = flameshot } },
 	{ 0,              XF86XK_AudioRaiseVolume, spawn,          {.v = increasevolume } },
 	{ 0,              XF86XK_AudioLowerVolume, spawn,          {.v = decreasevolume } },
